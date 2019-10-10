@@ -4,9 +4,10 @@ import shelve
 class basicTask():
     def __init__(self, nameDesc, initialDate, xDelay):
         self.name = nameDesc # A concise description of what you do in the task.
-        self.initialDate = initialDate #The date to first do the task on. The date on which all calculations are based.
+        self.initialDate = initialDate#The date to first do the task on. The date on which all calculations are based.
         self.xDelay = xDelay
-        self.nextDueDate = self.getDueDate()
+        self.dueDate = self.getDueDate()
+        self.nextDueDate = self.dueDate
 
     # Calculate next occurence, xDays after initialDate
     def getDueDate(self):
@@ -15,12 +16,42 @@ class basicTask():
         return nextDate
     
     def isDueToday(self):
-        rawDueDate = self.nextDueDate
+        rawDueDate = self.dueDate
         rawTodayDate = datetime.datetime.now()
         today = (rawTodayDate.year, rawTodayDate.month, rawTodayDate.day)
         dueDate = (rawDueDate.year, rawDueDate.month, rawDueDate.day)
 
-        return today == dueDate
+        if today == dueDate:
+            self.initialDate = datetime.datetime.now()
+            self.nextDueDate = self.getDueDate()
+            return True
+        
+        elif today > dueDate:
+            print('Due date has passed.')
+            difference = datetime.datetime(today) - datetime.datetime(dueDate)
+            self.initialDate = datetime.datetime(today) - difference
+            self.dueDate = self.getDueDate()
+            self.nextDueDate = self.dueDate
+            return False
+        else:
+            return False
+
+
+    
+    def updateDueDate(self):
+        if self.isDueToday():
+            self.initialDate = datetime.datetime.now()
+            self.nextDueDate = self.getDueDate()
+            
+        elif self.dueDate < datetime.datetime.now():
+            self.dueDate = self.getDueDate()
+            self.nextDueDate = self.dueDate
+
+
+
+    
+
+    
 
 
 
@@ -174,11 +205,13 @@ print(getDayName(todayDate))
 
 ### Testing Day Recurring Task
 
-# plants = dayReccuringTask('Water the plants', todayDate, 10)
+tenDaysAgo = datetime.datetime.now() - datetime.timedelta(12)
 
-# print(plants.name)
-# print(plants.nextDueDate)
-# print(plants.isDueToday())
+plants = dayReccuringTask('Water the plants', tenDaysAgo, 10)
+
+print(plants.name)
+print(plants.nextDueDate)
+print(plants.isDueToday())
 
 
 ### Testing Week Recurring Task
@@ -199,11 +232,6 @@ print(getDayName(todayDate))
 
 ### Testing Dayname Recurring Task
 
-study = dayNameBasedTask('Study Polish', todayDate, ['Sun'])
-print(study.isDueToday())
-print(study.nextDueDate)
-
-
-
-
-### OI I BET I COULD USE MODULO WHICH MEANS I DON'T NEED NO FUCKIN DUE-DATE UPDATING LINE.
+# study = dayNameBasedTask('Study Polish', todayDate, ['Thu'])
+# print(study.isDueToday())
+# print(study.nextDueDate)
