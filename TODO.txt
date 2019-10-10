@@ -1,0 +1,19 @@
+TODO:
+
+
+- Make the tasks generate another due date when current due date is today.
+	- Do I need another date variable for this?
+
+
+
+
+CHANGELOG:
+
+---
+
+2019-10-10
+
+I set up all the classes so each type of task knows when the task is meant to begin, and then it can tell you if it is due today.
+I have also set up the day-name-based tasks too, which seems to work.
+
+---

@@ -1,20 +1,16 @@
 import datetime
 import shelve
 
-class task():
-    def __init__(self, nameDesc, initialDate):
+class basicTask():
+    def __init__(self, nameDesc, initialDate, xDelay):
         self.name = nameDesc # A concise description of what you do in the task.
         self.initialDate = initialDate #The date to first do the task on. The date on which all calculations are based.
-
-class dayReccuring(task):
-    def __init__(self, nameDesc, initialDate, xDays):
-        super().__init__(nameDesc, initialDate)
-        self.xDays = xDays
+        self.xDelay = xDelay
         self.nextDueDate = self.getDueDate()
 
     # Calculate next occurence, xDays after initialDate
     def getDueDate(self):
-        dayDelta = datetime.timedelta(self.xDays)
+        dayDelta = datetime.timedelta(self.xDelay)
         nextDate = self.initialDate + dayDelta
         return nextDate
     
@@ -26,7 +22,94 @@ class dayReccuring(task):
 
         return today == dueDate
 
+
+
+class dayNameBasedTask(basicTask):
+    def __init__(self, nameDesc, initialDate, dayList):
+        super().__init__(nameDesc, initialDate, dayList)
+
+    def getDueDate(self):
+        days  = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+        dayNumbers = [days.index(day) for day in self.xDelay]
+        todayDayNumber = int(datetime.datetime.now().strftime('%w'))
+
+        
+        nextDay = False
+        for day in dayNumbers:
+            if day >= todayDayNumber:
+                print(f'The next day is {days[day]}')
+                nextDay = day
+                break
+        if nextDay == False:
+            nextDay = dayNumbers[0]
+        
+        if nextDay == todayDayNumber:
+            return datetime.datetime.now()
+        else:
+                    
+            dayDifference = nextDay - todayDayNumber
+            if dayDifference < 0:
+                dayDifference += 7
+            
+            deltaDifference = datetime.timedelta(days=dayDifference)
+
+            nextDate = datetime.datetime.now() + deltaDifference
+
+            return nextDate
+
+
+        
+
+    def isDueToday(self):
+
+        todayDayName = datetime.datetime.now().strftime('%a')
+        if todayDayName in self.xDelay:
+            return True
+        else:
+            return False
     
+
+
+
+class dayReccuringTask(basicTask):
+    def __init__(self, nameDesc, initialDate, xDays):
+        super().__init__(nameDesc, initialDate, xDays)
+
+
+    # Calculate next occurence, xDays after initialDate
+    def getDueDate(self):
+        dayDelta = datetime.timedelta(self.xDelay)
+        nextDate = self.initialDate + dayDelta
+        return nextDate
+
+class weekRecurringTask(basicTask):
+    def __init__(self, nameDesc, initialDate, xWeeks):
+        super().__init__(nameDesc, initialDate, xWeeks)
+
+
+    # Override: Calculate next occurence, xWeeks after initialDate
+    def getDueDate(self):
+        weekDelta = datetime.timedelta(weeks=self.xDelay)
+        nextDate = self.initialDate + weekDelta
+        return nextDate
+
+class monthRecurringTask(basicTask):
+    def __init__(self, nameDesc, initialDate, xMonths):
+        super().__init__(nameDesc, initialDate, xMonths)
+
+
+    # Override: Calculate next occurence, xMonths after initialDate
+    def getDueDate(self):
+        inDateYear = self.initialDate.year
+        inDateMonth = self.initialDate.month
+        inDateDay = self.initialDate.day
+
+        nextDateYear = inDateYear
+        nextMonth = inDateMonth + self.xDelay
+        while nextMonth > 12:
+            nextMonth -= 12
+            nextDateYear += 1
+        return datetime.datetime(nextDateYear, nextMonth, inDateDay)
 
 
 # NextByDays - Given a date, calculates the next occurence for x days later, e.g '10 days later'. Used for 'Every X days'
@@ -57,7 +140,15 @@ def calculateNextByMonths(inDate, _months):
 
 # getDayName - Given a date, returns the day's name: Monday, Saturday, etc. Part of 'Every mon-, wed-, friday'
 def getDayName(indate):
-    return indate.strftime('%A') 
+    return indate.strftime('%a')
+
+def checkDueOnXDay(indate, listOfDueDays):
+    todayDayName = getDayName(indate)
+    if todayDayName in listOfDueDays:
+        return True
+    else:
+        return False
+
 
 
        
@@ -75,22 +166,44 @@ def getDayName(indate):
 
 
 todayDate = datetime.datetime.now()
+# todayDate = datetime.datetime(2020,4,10)
 
-plants = dayReccuring('Water the plants', todayDate, 10)
-
-print(plants.name)
-print(plants.nextDueDate)
-print(plants.isDueToday())
+print(getDayName(todayDate))
 
 
 
+### Testing Day Recurring Task
+
+# plants = dayReccuringTask('Water the plants', todayDate, 10)
+
+# print(plants.name)
+# print(plants.nextDueDate)
+# print(plants.isDueToday())
+
+
+### Testing Week Recurring Task
+
+# reportsTask = weekRecurringTask('Write Reports', todayDate, 12)
+
+# print(reportsTask.name)
+# print(reportsTask.nextDueDate)
+# print(reportsTask.isDueToday())
+
+
+### Testing Month Recurring Task
+
+# KBcertificateTask = monthRecurringTask('Renew KB Injung Cert', todayDate, 6)
+# print(KBcertificateTask.name)
+# print(KBcertificateTask.nextDueDate)
+# print(KBcertificateTask.isDueToday())
+
+### Testing Dayname Recurring Task
+
+study = dayNameBasedTask('Study Polish', todayDate, ['Sun'])
+print(study.isDueToday())
+print(study.nextDueDate)
 
 
 
 
-
-# It's tough to write this here where people are talking.
-
-# Include: a task that repeats on every ___day in a given week (every mon and fri , every thursday).
-# Include: a task that repeats on the __th of each month.
-# Include: a task that repeats every n days.
+### OI I BET I COULD USE MODULO WHICH MEANS I DON'T NEED NO FUCKIN DUE-DATE UPDATING LINE.
