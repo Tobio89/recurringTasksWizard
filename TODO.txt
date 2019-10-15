@@ -1,12 +1,18 @@
 TODO:
 
-- Add due date reset function for list ver.
+- Add day of the week version
 
 
 
 CHANGELOG:
 
-2019-10-15
+2019-10-15 #2
+
+After further work, I have managed to get a stable and working class with functions.
+There is now a main 'isdueToday' function that calls the resetDueDates function as part of its process. This means that, when using the class, set the initial date wisely, and then you will rely on the 'isDueToday' function to tell due dates. This should be called first.
+
+
+2019-10-15 #1
 
 In the normal version I made a function to reset the due date. This works, but I think there are some holes in it, for example - what happens if you miss a due date by a long time?
 

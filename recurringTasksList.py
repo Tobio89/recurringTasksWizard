@@ -48,7 +48,7 @@ class basicTask():
     def renewDueDates(self):
         today = getTimelessDate(datetime.datetime.now())
         lastDate = self.dueDates[-1] # Use this date for calculations if all dates have gone by.
-        listOfRemainingDates = [date for date in self.dueDates if date > today]
+        listOfRemainingDates = [date for date in self.dueDates if date >= today]
         interval = datetime.timedelta(self.xDelay)
 
         newDates = []
@@ -65,7 +65,11 @@ class basicTask():
         else: # If all dates have passed
             elapsedTime = getTimelessDate(datetime.datetime.now()) - lastDate
             howManyMissed = elapsedTime.days // interval.days # .days for a day-based task
-            nextDueDate = lastDate + (datetime.timedelta(interval.days) * (howManyMissed + 1))
+            moduloDays = elapsedTime.days % interval.days # To see if the task is on a valid day, according to its pattern
+            if moduloDays:
+                nextDueDate = lastDate + (datetime.timedelta(interval.days) * (howManyMissed + 1))
+            else:
+                nextDueDate = lastDate + (datetime.timedelta(interval.days) * (howManyMissed))
 
             newDates.append(nextDueDate)
             for _ in range(self.foresight):
@@ -74,19 +78,22 @@ class basicTask():
       
         self.dueDates = listOfRemainingDates + newDates
 
-    
+    def isDueToday(self):
+        self.renewDueDates()
+        today = getTimelessDate(datetime.datetime.now())
+        if today in self.dueDates:
+            return True
+        else:
+            return False
 
 
-aLongTimeAgo = getTimelessDate(datetime.datetime(2019, 2, 2))
+
+aLongTimeAgo = getTimelessDate(datetime.datetime(2019, 2, 12))
 lastMonth = getTimelessDate(datetime.datetime(2019, 8, 14))
 todayDate = getTimelessDate(datetime.datetime.now())
 task1 = basicTask('Study', aLongTimeAgo, 7)
 print(task1.description)
-print('Initial due dates')
+print(task1.isDueToday())
 pprint.pprint(task1.dueDates)
-task1.renewDueDates()
-print('Remaining due dates')
-pprint.pprint(task1.dueDates)
-print(task1)
 
 
