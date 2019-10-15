@@ -16,13 +16,16 @@ class basicTask():
 
 
     def __str__(self):
-        return (f'{self.description}: next due on {self.formattedDue()}')
+        formattedDate = self.getNextDue().strftime('%a, %d of %B')
+        return (f'{self.description}: next due on {formattedDate}')
     
-    def nextDue(self):
-        return self.dueDates[0]
-    
-    def formattedDue(self):
-        return self.getDueDates()[0].strftime('%a, %d of %B')
+    def getNextDue(self):
+        
+        if self.dueDates[0] > self.startDate:
+            return self.dueDates[0]
+        else:
+            return self.startDate
+
         
 
     # Calculate next occurence, xDays after initialDate
@@ -31,6 +34,7 @@ class basicTask():
         dueDateList = []
         interval = datetime.timedelta(self.xDelay)
         dueDate = self.startDate
+        
         if self.startDate >= getTimelessDate(datetime.datetime.now()):
             dueDateList.append(getTimelessDate(datetime.datetime.now()))
             
@@ -70,6 +74,8 @@ class basicTask():
       
         self.dueDates = listOfRemainingDates + newDates
 
+    
+
 
 aLongTimeAgo = getTimelessDate(datetime.datetime(2019, 2, 2))
 lastMonth = getTimelessDate(datetime.datetime(2019, 8, 14))
@@ -82,6 +88,5 @@ task1.renewDueDates()
 print('Remaining due dates')
 pprint.pprint(task1.dueDates)
 print(task1)
-print(task1.formattedDue())
 
 
