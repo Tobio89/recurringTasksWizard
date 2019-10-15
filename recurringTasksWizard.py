@@ -28,8 +28,10 @@ class basicTask():
         
         elif today > dueDate:
             print('Due date has passed.')
-            difference = datetime.datetime(today) - datetime.datetime(dueDate)
-            self.initialDate = datetime.datetime(today) - difference
+            todayDateTimeObj = datetime.datetime(today[0], today[1], today[2])
+            dueDateDateTimeObj = datetime.datetime(dueDate[0], dueDate[1], dueDate[2])
+            difference = todayDateTimeObj - dueDateDateTimeObj
+            self.initialDate = todayDateTimeObj - difference
             self.dueDate = self.getDueDate()
             self.nextDueDate = self.dueDate
             return False
@@ -67,7 +69,7 @@ class dayNameBasedTask(basicTask):
         
         nextDay = False
         for day in dayNumbers:
-            if day >= todayDayNumber:
+            if day > todayDayNumber:
                 print(f'The next day is {days[day]}')
                 nextDay = day
                 break
@@ -205,13 +207,14 @@ print(getDayName(todayDate))
 
 ### Testing Day Recurring Task
 
-tenDaysAgo = datetime.datetime.now() - datetime.timedelta(12)
+# tenDaysAgo = datetime.datetime.now() - datetime.timedelta(10)
 
-plants = dayReccuringTask('Water the plants', tenDaysAgo, 10)
+# plants = dayReccuringTask('Water the plants', tenDaysAgo, 10)
 
-print(plants.name)
-print(plants.nextDueDate)
-print(plants.isDueToday())
+# print(plants.name)
+# print(plants.nextDueDate)
+# print(plants.isDueToday())
+# print(plants.nextDueDate)
 
 
 ### Testing Week Recurring Task
@@ -232,6 +235,7 @@ print(plants.isDueToday())
 
 ### Testing Dayname Recurring Task
 
-# study = dayNameBasedTask('Study Polish', todayDate, ['Thu'])
-# print(study.isDueToday())
-# print(study.nextDueDate)
+study = dayNameBasedTask('Study Polish', todayDate, ['Sun', 'Wed', 'Fri'])
+print(study.isDueToday())
+print(study.nextDueDate)
+print(study.dueDate)
