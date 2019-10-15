@@ -11,8 +11,18 @@ class basicTask():
         self.description = nameDesc # A concise description of what you do in the task.
         self.startDate = startDate #The date to first do the task on. The date on which all calculations are based.
         self.xDelay = xDelay
-        self.foresight = 10
+        self.foresight = 5
         self.dueDates = self.getDueDates()
+
+
+    def __str__(self):
+        return (f'{self.description}: next due on {self.formattedDue()}')
+    
+    def nextDue(self):
+        return self.dueDates[0]
+    
+    def formattedDue(self):
+        return self.getDueDates()[0].strftime('%a, %d of %B')
         
 
     # Calculate next occurence, xDays after initialDate
@@ -21,8 +31,9 @@ class basicTask():
         dueDateList = []
         interval = datetime.timedelta(self.xDelay)
         dueDate = self.startDate
-        if self.startDate == getTimelessDate(datetime.datetime.now()):
+        if self.startDate >= getTimelessDate(datetime.datetime.now()):
             dueDateList.append(getTimelessDate(datetime.datetime.now()))
+            
 
         for _ in range(foresightCount):
             dueDate += interval
@@ -34,33 +45,43 @@ class basicTask():
         today = getTimelessDate(datetime.datetime.now())
         lastDate = self.dueDates[-1] # Use this date for calculations if all dates have gone by.
         listOfRemainingDates = [date for date in self.dueDates if date > today]
+        interval = datetime.timedelta(self.xDelay)
 
         newDates = []
 
-        if len(listOfRemainingDates) > 0:
+        if len(listOfRemainingDates) > 0: # If some valid dates are still present in the list:
             dueDatesToGet = self.foresight - len(listOfRemainingDates)       
             calculateFrom = listOfRemainingDates[-1]
 
-            interval = datetime.timedelta(self.xDelay)
+            
             for _ in range(dueDatesToGet):
                 calculateFrom += interval
                 newDates.append(calculateFrom)
 
+        else: # If all dates have passed
+            elapsedTime = getTimelessDate(datetime.datetime.now()) - lastDate
+            howManyMissed = elapsedTime.days // interval.days # .days for a day-based task
+            nextDueDate = lastDate + (datetime.timedelta(interval.days) * (howManyMissed + 1))
 
-        
-
-
-
+            newDates.append(nextDueDate)
+            for _ in range(self.foresight):
+                nextDueDate += interval
+                newDates.append(nextDueDate)
+      
         self.dueDates = listOfRemainingDates + newDates
 
 
-
+aLongTimeAgo = getTimelessDate(datetime.datetime(2019, 2, 2))
 lastMonth = getTimelessDate(datetime.datetime(2019, 8, 14))
 todayDate = getTimelessDate(datetime.datetime.now())
-task1 = basicTask('Study', lastMonth, 7)
+task1 = basicTask('Study', aLongTimeAgo, 7)
 print(task1.description)
 print('Initial due dates')
 pprint.pprint(task1.dueDates)
 task1.renewDueDates()
 print('Remaining due dates')
 pprint.pprint(task1.dueDates)
+print(task1)
+print(task1.formattedDue())
+
+

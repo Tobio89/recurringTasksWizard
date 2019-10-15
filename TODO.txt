@@ -1,13 +1,17 @@
 TODO:
 
-
-- Make the tasks generate another due date when current due date is today.
-	- Do I need another date variable for this?
-
+- Add due date reset function for list ver.
 
 
 
 CHANGELOG:
+
+2019-10-15
+
+In the normal version I made a function to reset the due date. This works, but I think there are some holes in it, for example - what happens if you miss a due date by a long time?
+
+I started a new version that stores the due dates in a list. I now need to make it add dates to the list as they pass.
+
 
 ---
 
