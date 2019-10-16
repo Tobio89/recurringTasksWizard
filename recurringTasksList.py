@@ -87,13 +87,41 @@ class basicTask():
             return False
 
 
+    def delay(self, delayamt):
+        '''
+        delayamt = how long to delay the due date, in days
+        '''
+        delayDate = self.dueDates[0] + datetime.timedelta(delayamt)
 
-aLongTimeAgo = getTimelessDate(datetime.datetime(2019, 2, 12))
+        slicePoint = len(self.dueDates)
+        for date in range(len(self.dueDates)):
+            if delayDate <= self.dueDates[date]:
+                slicePoint = date
+                break
+        print(slicePoint)
+
+        if slicePoint < len(self.dueDates):
+            self.dueDates = self.dueDates[slicePoint:]
+            self.dueDates.insert(0, delayDate)
+        else:
+            self.dueDates.clear()
+            self.dueDates.append(delayDate)
+                
+            
+        
+
+aLongTimeAgo = getTimelessDate(datetime.datetime(2019, 2, 13))
 lastMonth = getTimelessDate(datetime.datetime(2019, 8, 14))
 todayDate = getTimelessDate(datetime.datetime.now())
 task1 = basicTask('Study', aLongTimeAgo, 7)
 print(task1.description)
 print(task1.isDueToday())
+task1.delay(2)
+print(task1.isDueToday())
 pprint.pprint(task1.dueDates)
+
+
+
+
 
 
