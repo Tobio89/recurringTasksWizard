@@ -16,7 +16,7 @@ class basicTask():
 
 
     def __str__(self):
-        formattedDate = self.getNextDue().strftime('%a, %d of %B')
+        formattedDate = self.getNextDue().strftime('%A, %d of %B,')
         return (f'{self.description}: next due on {formattedDate}')
     
     def getNextDue(self):
@@ -93,32 +93,35 @@ class basicTask():
         '''
         delayDate = self.dueDates[0] + datetime.timedelta(delayamt)
 
-        slicePoint = len(self.dueDates)
+        slicePoint = len(self.dueDates) # How many dates to cut off
         for date in range(len(self.dueDates)):
             if delayDate <= self.dueDates[date]:
                 slicePoint = date
                 break
-        print(slicePoint)
 
-        if slicePoint < len(self.dueDates):
+        if slicePoint < len(self.dueDates): # Meaning you're not delaying past all of the due dates
             self.dueDates = self.dueDates[slicePoint:]
             self.dueDates.insert(0, delayDate)
-        else:
+        else: # If you're delaying it beyond all the due dates
             self.dueDates.clear()
             self.dueDates.append(delayDate)
                 
-            
+
+    def printDueDates(self):
+        for date in self.dueDates:
+            formattedDate = date.strftime('%Y/%m/%d, a %A')
+            print(formattedDate)            
         
 
-aLongTimeAgo = getTimelessDate(datetime.datetime(2019, 2, 13))
+aLongTimeAgo = getTimelessDate(datetime.datetime(2019, 2, 12))
 lastMonth = getTimelessDate(datetime.datetime(2019, 8, 14))
 todayDate = getTimelessDate(datetime.datetime.now())
 task1 = basicTask('Study', aLongTimeAgo, 7)
 print(task1.description)
 print(task1.isDueToday())
-task1.delay(2)
+# task1.delay(2)
 print(task1.isDueToday())
-pprint.pprint(task1.dueDates)
+task1.printDueDates()
 
 
 
