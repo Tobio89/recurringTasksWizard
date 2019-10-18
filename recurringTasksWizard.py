@@ -1,241 +1,101 @@
+import shelve, pprint
 import datetime
-import shelve
 
-class basicTask():
-    def __init__(self, nameDesc, initialDate, xDelay):
-        self.name = nameDesc # A concise description of what you do in the task.
-        self.initialDate = initialDate#The date to first do the task on. The date on which all calculations are based.
-        self.xDelay = xDelay
-        self.dueDate = self.getDueDate()
-        self.nextDueDate = self.dueDate
+from recurringTasksList import getTimelessDate, basicTask
 
-    # Calculate next occurence, xDays after initialDate
-    def getDueDate(self):
-        dayDelta = datetime.timedelta(self.xDelay)
-        nextDate = self.initialDate + dayDelta
-        return nextDate
-    
-    def isDueToday(self):
-        rawDueDate = self.dueDate
-        rawTodayDate = datetime.datetime.now()
-        today = (rawTodayDate.year, rawTodayDate.month, rawTodayDate.day)
-        dueDate = (rawDueDate.year, rawDueDate.month, rawDueDate.day)
+initTime = 'initTime'
+interval = 'interval'
 
-        if today == dueDate:
-            self.initialDate = datetime.datetime.now()
-            self.nextDueDate = self.getDueDate()
-            return True
+# tasksDict = {
+#     'Study Polish': {
+#         initTime : datetime.datetime(2019,10,21),
+#         interval : 7
+#     },
+#     'Study Korean': {
+#         initTime : datetime.datetime(2019,10,23),
+#         interval : 7
+#     },
+#     'Vacuum the house': {
+#         initTime : datetime.datetime(2019,10,18),
+#         interval : 3
+#     },
+# }
+
+# with shelve.open('MyTaskData') as shelfFile:
+#     shelfFile['taskData'] = tasksDict
+
+
+
+def getTaskData():
+    with shelve.open('MyTaskData') as shelfFile:
+        dic = shelfFile['taskData']
+    return dic
+
+def saveTaskData(updatedDic):
+    with shelve.open('MyTaskData') as shelfFile:
+        shelfFile['taskData'] = updatedDic
+        print('Task Data Dictionary has been saved')
+
+
+if __name__ == '__main__':
+
+    print('RECURRING TASK WIZARD')
+    tasksDict = getTaskData()
+    pprint.pprint(tasksDict)
+
+    while True:
+        usercom = input('Enter a command:')
+
+        if usercom.lower() == 'exit':
+            break
         
-        elif today > dueDate:
-            print('Due date has passed.')
-            todayDateTimeObj = datetime.datetime(today[0], today[1], today[2])
-            dueDateDateTimeObj = datetime.datetime(dueDate[0], dueDate[1], dueDate[2])
-            difference = todayDateTimeObj - dueDateDateTimeObj
-            self.initialDate = todayDateTimeObj - difference
-            self.dueDate = self.getDueDate()
-            self.nextDueDate = self.dueDate
-            return False
-        else:
-            return False
+        elif usercom.lower() == 'save':
+            print('Saving...')
+            saveTaskData(tasksDict)
 
-
-    
-    def updateDueDate(self):
-        if self.isDueToday():
-            self.initialDate = datetime.datetime.now()
-            self.nextDueDate = self.getDueDate()
+        elif usercom.lower() == 'add':
             
-        elif self.dueDate < datetime.datetime.now():
-            self.dueDate = self.getDueDate()
-            self.nextDueDate = self.dueDate
+            try:
+                taskDescription = input('Enter the description for the task: ')
+                dateDetails = input('Enter the date the task will begin: ')
 
+                if dateDetails.lower() == 'today':
+                    dateDetails = getTimelessDate(datetime.datetime.now())
+                else:
+                    try:
+                        separatedDate = dateDetails.split('/')
+                        dateDetails = datetime.datetime(separatedDate[0], separatedDate[1], separatedDate[2])
+                    except:
+                        print('Invalid date entered. Use "/" characters to separate the date, as YEAR/MONTH/DAY')
+                        continue
+                
+                specifiedInterval = int(input('Enter the interval in days: '))
 
-
-    
-
-    
-
-
-
-class dayNameBasedTask(basicTask):
-    def __init__(self, nameDesc, initialDate, dayList):
-        super().__init__(nameDesc, initialDate, dayList)
-
-    def getDueDate(self):
-        days  = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
-        dayNumbers = [days.index(day) for day in self.xDelay]
-        todayDayNumber = int(datetime.datetime.now().strftime('%w'))
-
+                tasksDict[taskDescription] = {
+                    initTime : dateDetails,
+                    interval : specifiedInterval
+                }
+            except:
+                print('Error adding task. Was the date in the correct format? YEAR/MONTH/DATE')
+                continue
         
-        nextDay = False
-        for day in dayNumbers:
-            if day > todayDayNumber:
-                print(f'The next day is {days[day]}')
-                nextDay = day
-                break
-        if nextDay == False:
-            nextDay = dayNumbers[0]
-        
-        if nextDay == todayDayNumber:
-            return datetime.datetime.now()
-        else:
-                    
-            dayDifference = nextDay - todayDayNumber
-            if dayDifference < 0:
-                dayDifference += 7
+        elif usercom.lower() == 'delete':
+            keys = list(tasksDict.keys())
+            for number, key in enumerate(keys):
+                print(f'[{number}]: {key}')
+            delNum = int(input('Enter the number of the task you want to delete: '))
+
+            delTask = keys[delNum]
+
+            removedTask = tasksDict.pop(delTask)
+
+            print(f'Removed task: {delTask}.')
+
+        elif usercom.lower() == 'print':
+            pprint.pprint(tasksDict)
+
+
+
             
-            deltaDifference = datetime.timedelta(days=dayDifference)
-
-            nextDate = datetime.datetime.now() + deltaDifference
-
-            return nextDate
-
-
-        
-
-    def isDueToday(self):
-
-        todayDayName = datetime.datetime.now().strftime('%a')
-        if todayDayName in self.xDelay:
-            return True
-        else:
-            return False
     
 
-
-
-class dayReccuringTask(basicTask):
-    def __init__(self, nameDesc, initialDate, xDays):
-        super().__init__(nameDesc, initialDate, xDays)
-
-
-    # Calculate next occurence, xDays after initialDate
-    def getDueDate(self):
-        dayDelta = datetime.timedelta(self.xDelay)
-        nextDate = self.initialDate + dayDelta
-        return nextDate
-
-class weekRecurringTask(basicTask):
-    def __init__(self, nameDesc, initialDate, xWeeks):
-        super().__init__(nameDesc, initialDate, xWeeks)
-
-
-    # Override: Calculate next occurence, xWeeks after initialDate
-    def getDueDate(self):
-        weekDelta = datetime.timedelta(weeks=self.xDelay)
-        nextDate = self.initialDate + weekDelta
-        return nextDate
-
-class monthRecurringTask(basicTask):
-    def __init__(self, nameDesc, initialDate, xMonths):
-        super().__init__(nameDesc, initialDate, xMonths)
-
-
-    # Override: Calculate next occurence, xMonths after initialDate
-    def getDueDate(self):
-        inDateYear = self.initialDate.year
-        inDateMonth = self.initialDate.month
-        inDateDay = self.initialDate.day
-
-        nextDateYear = inDateYear
-        nextMonth = inDateMonth + self.xDelay
-        while nextMonth > 12:
-            nextMonth -= 12
-            nextDateYear += 1
-        return datetime.datetime(nextDateYear, nextMonth, inDateDay)
-
-
-# NextByDays - Given a date, calculates the next occurence for x days later, e.g '10 days later'. Used for 'Every X days'
-def calculateNextByDays(inDate, _days):
-    dayDelta = datetime.timedelta(_days)
-    nextDate = inDate + dayDelta
-    return nextDate
-
-# Next ByWeeks - Given a date, calculates the next occurence for x weeks later, used for 'Every X weeks'
-def calculateNextByWeeks(inDate, _weeks):
-    weekDelta = datetime.timedelta(weeks=_weeks)
-    nextDate = inDate + weekDelta
-    return nextDate
-
-# NextByMonths - Given a date, calculates the next occurence for x months later, used for 'Every X months'
-def calculateNextByMonths(inDate, _months):
-    inDateYear = inDate.year
-    inDateMonth = inDate.month
-    inDateDay = inDate.day
-
-    nextDateYear = inDateYear
-    nextMonth = inDate.month + _months
-    while nextMonth > 12:
-        nextMonth -= 12
-        nextDateYear += 1
-    return datetime.datetime(nextDateYear, nextMonth, inDateDay)
-
-
-# getDayName - Given a date, returns the day's name: Monday, Saturday, etc. Part of 'Every mon-, wed-, friday'
-def getDayName(indate):
-    return indate.strftime('%a')
-
-def checkDueOnXDay(indate, listOfDueDays):
-    todayDayName = getDayName(indate)
-    if todayDayName in listOfDueDays:
-        return True
-    else:
-        return False
-
-
-
-       
-        
-
-    
-
-
-
-
-
-# waterPlants = task()
-
-
-
-
-todayDate = datetime.datetime.now()
-# todayDate = datetime.datetime(2020,4,10)
-
-print(getDayName(todayDate))
-
-
-
-### Testing Day Recurring Task
-
-# tenDaysAgo = datetime.datetime.now() - datetime.timedelta(10)
-
-# plants = dayReccuringTask('Water the plants', tenDaysAgo, 10)
-
-# print(plants.name)
-# print(plants.nextDueDate)
-# print(plants.isDueToday())
-# print(plants.nextDueDate)
-
-
-### Testing Week Recurring Task
-
-# reportsTask = weekRecurringTask('Write Reports', todayDate, 12)
-
-# print(reportsTask.name)
-# print(reportsTask.nextDueDate)
-# print(reportsTask.isDueToday())
-
-
-### Testing Month Recurring Task
-
-# KBcertificateTask = monthRecurringTask('Renew KB Injung Cert', todayDate, 6)
-# print(KBcertificateTask.name)
-# print(KBcertificateTask.nextDueDate)
-# print(KBcertificateTask.isDueToday())
-
-### Testing Dayname Recurring Task
-
-study = dayNameBasedTask('Study Polish', todayDate, ['Sun', 'Wed', 'Fri'])
-print(study.isDueToday())
-print(study.nextDueDate)
-print(study.dueDate)

@@ -113,15 +113,15 @@ class basicTask():
             print(formattedDate)            
         
 
-aLongTimeAgo = getTimelessDate(datetime.datetime(2019, 2, 12))
-lastMonth = getTimelessDate(datetime.datetime(2019, 8, 14))
-todayDate = getTimelessDate(datetime.datetime.now())
-task1 = basicTask('Study', aLongTimeAgo, 7)
-print(task1.description)
-print(task1.isDueToday())
-# task1.delay(2)
-print(task1.isDueToday())
-task1.printDueDates()
+# aLongTimeAgo = getTimelessDate(datetime.datetime(2019, 2, 12))
+# lastMonth = getTimelessDate(datetime.datetime(2019, 8, 14))
+# todayDate = getTimelessDate(datetime.datetime.now())
+# task1 = basicTask('Study', aLongTimeAgo, 7)
+# print(task1.description)
+# print(task1.isDueToday())
+# # task1.delay(2)
+# print(task1.isDueToday())
+# task1.printDueDates()
 
 
 
