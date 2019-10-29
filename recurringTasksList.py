@@ -35,7 +35,7 @@ class basicTask():
         interval = datetime.timedelta(self.xDelay)
         dueDate = self.startDate
         
-        if self.startDate >= getTimelessDate(datetime.datetime.now()):
+        if self.startDate == getTimelessDate(datetime.datetime.now()):
             dueDateList.append(getTimelessDate(datetime.datetime.now()))
             
 
@@ -114,14 +114,16 @@ class basicTask():
         
 
 # aLongTimeAgo = getTimelessDate(datetime.datetime(2019, 2, 12))
+# nextWed = datetime.datetime(2019,10,23)
 # lastMonth = getTimelessDate(datetime.datetime(2019, 8, 14))
 # todayDate = getTimelessDate(datetime.datetime.now())
-# task1 = basicTask('Study', aLongTimeAgo, 7)
+# task1 = basicTask('Study', nextWed, 7)
 # print(task1.description)
 # print(task1.isDueToday())
 # # task1.delay(2)
 # print(task1.isDueToday())
 # task1.printDueDates()
+
 
 
 

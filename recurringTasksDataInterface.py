@@ -39,15 +39,16 @@ def saveTaskData(updatedDic):
         print('Task Data Dictionary has been saved')
 
 
+if os.path.exists(homeCWD):
+    os.chdir(r'C:\Users\User\.spyder-py3\Ultraccountability\recurringTasksWizard\dict')
+        
+    tasksDict = getTaskData()
+
+
 if __name__ == '__main__':
 
     try:
-        if os.path.exists(homeCWD):
-            os.chdir(r'C:\Users\User\.spyder-py3\Ultraccountability\recurringTasksWizard\dict')
-
-
         print('RECURRING TASK WIZARD')
-        tasksDict = getTaskData()
         pprint.pprint(tasksDict)
 
         while True:

@@ -1,101 +1,126 @@
-import shelve, pprint
-import datetime
+import datetime, os, pprint, shelve
 
+import recurringTasksDataInterface as tasksData
 from recurringTasksList import getTimelessDate, basicTask
 
-initTime = 'initTime'
-interval = 'interval'
 
-# tasksDict = {
-#     'Study Polish': {
-#         initTime : datetime.datetime(2019,10,21),
-#         interval : 7
-#     },
-#     'Study Korean': {
-#         initTime : datetime.datetime(2019,10,23),
-#         interval : 7
-#     },
-#     'Vacuum the house': {
-#         initTime : datetime.datetime(2019,10,18),
-#         interval : 3
-#     },
-# }
+os.chdir(r'C:\Users\User\.spyder-py3\Ultraccountability\recurringTasksWizard\dict')
 
-# with shelve.open('MyTaskData') as shelfFile:
-#     shelfFile['taskData'] = tasksDict
+taskDict = tasksData.tasksDict
+
+def saveToShelf(saveWhat):
+    with shelve.open('MyTaskData') as shelveFile:
+        print('Saving Task Objects...')
+        shelveFile['taskObjects'] = saveWhat
 
 
+def openShelf():
+    with shelve.open('MyTaskData') as shelveFile:
+        openWhat = shelveFile['taskObjects']
+    return openWhat
 
-def getTaskData():
-    with shelve.open('MyTaskData') as shelfFile:
-        dic = shelfFile['taskData']
-    return dic
+def checkNewTasks(taskObjectList):
+    incomingTasks = [task for task in taskDict.keys()]
 
-def saveTaskData(updatedDic):
-    with shelve.open('MyTaskData') as shelfFile:
-        shelfFile['taskData'] = updatedDic
-        print('Task Data Dictionary has been saved')
+    taskDescriptions = [task.description for task in taskObjectList]
+
+    newTasks = {desc : data for desc, data in taskDict.items()  if desc not in taskDescriptions}
+   
+
+    if newTasks:
+        print('Found new tasks:')
+        for item in newTasks.keys():
+            print(item)
+        return newTasks
+    else:
+        return None
+    
+
+   
+
+
+def addNewTasks(taskObjectList):
+    print('Checking for new tasks...')
+    newTasks = checkNewTasks(taskObjectList)
+
+    if newTasks:
+        
+        for taskItem in newTasks.items():
+            taskDesc = taskItem[0]
+            taskInitDate = taskItem[1]['initTime']
+            taskInterval = taskItem[1]['interval']
+
+            basicTaskObject = basicTask(taskDesc, taskInitDate, taskInterval)
+
+            taskObjectList.append(basicTaskObject)
+    else:
+        print('No new tasks imported; nothing to add.')
+
+    
+# basicTasks = []
+
+# for taskItem in taskDict.items():
+#     taskDesc = taskItem[0]
+#     taskInitDate = taskItem[1]['initTime']
+#     taskInterval = taskItem[1]['interval']
+
+#     basicTaskObject = basicTask(taskDesc, taskInitDate, taskInterval)
+#     basicTasks.append(basicTaskObject)
+
+# saveToShelf(basicTasks)
+
+
+
+
 
 
 if __name__ == '__main__':
+    basicTasks = openShelf()
 
-    print('RECURRING TASK WIZARD')
-    tasksDict = getTaskData()
-    pprint.pprint(tasksDict)
+    addNewTasks(basicTasks)
 
-    while True:
-        usercom = input('Enter a command:')
 
-        if usercom.lower() == 'exit':
-            break
-        
-        elif usercom.lower() == 'save':
-            print('Saving...')
-            saveTaskData(tasksDict)
+    tasksDueToday = []
 
-        elif usercom.lower() == 'add':
+    for task in basicTasks:
+        if task.isDueToday() == True:
+            tasksDueToday.append(task)
+
+
+
+    print('\nRECURRING TASKS WIZARD: What do you have to do today?\n')
+    if not tasksDueToday:
+        print('No scheduled tasks today\n')
+        input('Enter any key to exit')
+    else:
+        for task in tasksDueToday:
+            print(task.description)
             
-            try:
-                taskDescription = input('Enter the description for the task: ')
-                dateDetails = input('Enter the date the task will begin: ')
 
-                if dateDetails.lower() == 'today':
-                    dateDetails = getTimelessDate(datetime.datetime.now())
-                else:
-                    try:
-                        separatedDate = dateDetails.split('/')
-                        dateDetails = datetime.datetime(separatedDate[0], separatedDate[1], separatedDate[2])
-                    except:
-                        print('Invalid date entered. Use "/" characters to separate the date, as YEAR/MONTH/DAY')
-                        continue
-                
-                specifiedInterval = int(input('Enter the interval in days: '))
-
-                tasksDict[taskDescription] = {
-                    initTime : dateDetails,
-                    interval : specifiedInterval
-                }
-            except:
-                print('Error adding task. Was the date in the correct format? YEAR/MONTH/DATE')
-                continue
-        
-        elif usercom.lower() == 'delete':
-            keys = list(tasksDict.keys())
-            for number, key in enumerate(keys):
-                print(f'[{number}]: {key}')
-            delNum = int(input('Enter the number of the task you want to delete: '))
-
-            delTask = keys[delNum]
-
-            removedTask = tasksDict.pop(delTask)
-
-            print(f'Removed task: {delTask}.')
-
-        elif usercom.lower() == 'print':
-            pprint.pprint(tasksDict)
-
-
-
-            
+    print('\n')
     
+    print('Type "delay" to enter delay mode,')
+    usercom = input('Or enter any key to exit: ')
+    if usercom.lower() == 'delay':
+        delayMode = True
+        while delayMode:
+    
+            for index, item in enumerate(tasksDueToday):
+                print(f'{index}: {item.description}')
+            print('\n')
+            delayIndex = int(input('Enter the index of the task you want to delay: '))
+            delayLength = int(input('Enter the number of days to delay the task by: '))
+            tasksDueToday[delayIndex].delay(delayLength)
+            print(f"Task '{tasksDueToday[delayIndex].description}' was delayed by {delayLength} day/s" )
+
+            print("Enter 'continue' to continue delaying tasks,")
+            exitCom = input("Or enter any key to exit: ")
+
+            if exitCom.lower() not in ('continue', 'c'):
+                delayMode = False
+
+
+
+    saveToShelf(basicTasks)
+    print('See you tomorrow!')
 
