@@ -36,7 +36,25 @@ def checkNewTasks(taskObjectList):
         return None
     
 
+
+def deleteTasks(taskObjectList):
+    incomingTasks = [task for task in taskDict.keys()]
+
+    taskDescriptions = [task.description for task in taskObjectList]
+
+    updatedTaskList = []
+
+    for index, task in enumerate(taskDescriptions):
+        if task in incomingTasks:
+            updatedTaskList.append(taskObjectList[index])
+        
+    if len(updatedTaskList) < len(taskObjectList):
+        print('Some tasks were removed from the database.')
+    
+    return updatedTaskList
+    
    
+    
 
 
 def addNewTasks(taskObjectList):
@@ -70,7 +88,9 @@ def addNewTasks(taskObjectList):
 # saveToShelf(basicTasks)
 
 
+# basicTasks = openShelf()
 
+# print(basicTasks[5].dueDates)
 
 
 
@@ -78,8 +98,9 @@ if __name__ == '__main__':
     basicTasks = openShelf()
 
     addNewTasks(basicTasks)
+    basicTasks = deleteTasks(basicTasks)
 
-
+    
     tasksDueToday = []
 
     for task in basicTasks:
@@ -100,6 +121,7 @@ if __name__ == '__main__':
     print('\n')
     
     print('Type "delay" to enter delay mode,')
+    print('Type "list" to see all possible tasks,')
     usercom = input('Or enter any key to exit: ')
     if usercom.lower() == 'delay':
         delayMode = True
@@ -118,6 +140,12 @@ if __name__ == '__main__':
 
             if exitCom.lower() not in ('continue', 'c'):
                 delayMode = False
+    
+    elif usercom.lower() == 'list':
+        print('\nHere are all tasks, and their next due dates:\n')
+        for task in basicTasks:
+            print(task)
+        print('\n')
 
 
 

@@ -37,6 +37,9 @@ class basicTask():
         
         if self.startDate == getTimelessDate(datetime.datetime.now()):
             dueDateList.append(getTimelessDate(datetime.datetime.now()))
+        
+        elif self.startDate > getTimelessDate(datetime.datetime.now()):
+            dueDateList.append(self.startDate)
             
 
         for _ in range(foresightCount):
