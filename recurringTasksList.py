@@ -116,6 +116,119 @@ class basicTask():
             print(formattedDate)            
         
 
+class monthTask(basicTask):
+    # def __init__(self, nameDesc, initialDate, xMonths):
+    #     super().__init__(nameDesc, initialDate, xMonths)
+
+
+    # Override: Calculate next occurence, xMonths after initialDate
+    def getDueDates(self):
+        foresightCount = self.foresight
+        inDateYear = self.startDate.year
+        inDateMonth = self.startDate.month
+        inDateDay = self.startDate.day
+
+        dueDateList = []
+        nextMonth = inDateMonth
+        nextDateYear = inDateYear
+
+        if self.startDate == getTimelessDate(datetime.datetime.now()):
+            dueDateList.append(getTimelessDate(datetime.datetime.now()))
+            foresightCount -= 1
+            
+        elif self.startDate > getTimelessDate(datetime.datetime.now()):
+            dueDateList.append(self.startDate)
+            foresightCount -= 1
+
+        for _ in range(foresightCount):
+
+            
+            
+            nextMonth += self.xDelay
+            while nextMonth > 12:
+                nextMonth -= 12
+                nextDateYear += 1
+            dueDateList.append(datetime.datetime(nextDateYear, nextMonth, inDateDay))
+        
+        return dueDateList
+
+
+    def renewDueDates(self):
+        today = getTimelessDate(datetime.datetime.now())
+        lastDate = self.dueDates[-1] # Use this date for calculations if all dates have gone by.
+        listOfRemainingDates = [date for date in self.dueDates if date >= today]
+        
+
+        newDates = []
+
+        if len(listOfRemainingDates) > 0: # If some valid dates are still present in the list:
+            dueDatesToGet = self.foresight - len(listOfRemainingDates)       
+            calculateFrom = listOfRemainingDates[-1]
+
+            inDateYear = calculateFrom.year
+            inDateMonth = calculateFrom.month
+            inDateDay = calculateFrom.day
+
+            nextMonth = inDateMonth
+            nextDateYear = inDateYear
+            
+            for _ in range(dueDatesToGet):
+
+                nextMonth += self.xDelay
+                while nextMonth > 12:
+                    nextMonth -= 12
+                    nextDateYear += 1
+                newDates.append(datetime.datetime(nextDateYear, nextMonth, inDateDay))
+
+
+            self.dueDates = listOfRemainingDates + newDates
+
+        else: # If all dates have passed
+            elapsedYear = lastDate.year
+            elapsedMonth = lastDate.month   
+            elapsedDay = lastDate.day
+
+            calculateFrom = lastDate
+            calculateYear = elapsedYear
+            calculateMonth = elapsedMonth
+            calculateDay = elapsedDay
+
+            while calculateFrom < today: # Cycle through date creation until a date not elapsed is reached
+                calculateMonth += self.xDelay
+                while calculateMonth > 12:
+                    calculateMonth -= 12
+                    calculateYear += 1
+                calculateFrom = datetime.datetime(calculateYear, calculateMonth, calculateDay) # If this date is valid, it will continue to the next part of the program
+
+            foresight = self.foresight
+            if calculateFrom == today:
+                newDates.append(calculateFrom)
+                foresight -= 1
+                
+            for _ in range(foresight): # Creating a whole new set of dates
+
+                calculateMonth += self.xDelay 
+                while calculateMonth > 12:
+                    calculateMonth -= 12
+                    calculateYear += 1
+                newDates.append(datetime.datetime(calculateYear, calculateMonth, calculateDay))
+            
+
+
+                
+
+            
+      
+            self.dueDates = newDates
+
+# nextWed = datetime.datetime(2012,7,3)
+# monthlyTask1 = monthTask('Send money to UK',nextWed, 1)
+
+# print(monthlyTask1.dueDates)
+# print(monthlyTask1.isDueToday())
+# print(monthlyTask1.dueDates)
+
+
 # aLongTimeAgo = getTimelessDate(datetime.datetime(2019, 2, 12))
 # nextWed = datetime.datetime(2019,10,23)
 # lastMonth = getTimelessDate(datetime.datetime(2019, 8, 14))

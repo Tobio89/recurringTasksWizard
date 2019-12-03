@@ -146,6 +146,7 @@ if __name__ == '__main__':
         for task in basicTasks:
             print(task)
         print('\n')
+        input('Enter any key to exit: ')
 
 
 
