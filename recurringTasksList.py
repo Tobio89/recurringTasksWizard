@@ -16,8 +16,13 @@ class basicTask():
 
 
     def __str__(self):
-        formattedDate = self.getNextDue().strftime('%A, %d of %B,')
-        return (f'{self.description}: next due on {formattedDate}')
+        if self.getNextDue() == getTimelessDate(datetime.datetime.now()):
+            dueMessage = 'due TODAY'
+        elif self.getNextDue() == getTimelessDate(datetime.datetime.now() + datetime.timedelta(days=1)):
+            dueMessage = 'due tomorrow'
+        else:
+            dueMessage = f"next due on {self.getNextDue().strftime('%A, %d of %B,')}"
+        return (f'{self.description}: {dueMessage}')
     
     def getNextDue(self):
         
@@ -221,24 +226,6 @@ class monthTask(basicTask):
       
             self.dueDates = newDates
 
-# nextWed = datetime.datetime(2012,7,3)
-# monthlyTask1 = monthTask('Send money to UK',nextWed, 1)
-
-# print(monthlyTask1.dueDates)
-# print(monthlyTask1.isDueToday())
-# print(monthlyTask1.dueDates)
-
-
-# aLongTimeAgo = getTimelessDate(datetime.datetime(2019, 2, 12))
-# nextWed = datetime.datetime(2019,10,23)
-# lastMonth = getTimelessDate(datetime.datetime(2019, 8, 14))
-# todayDate = getTimelessDate(datetime.datetime.now())
-# task1 = basicTask('Study', nextWed, 7)
-# print(task1.description)
-# print(task1.isDueToday())
-# # task1.delay(2)
-# print(task1.isDueToday())
-# task1.printDueDates()
 
 
 
