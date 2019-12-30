@@ -64,6 +64,7 @@ if __name__ == '__main__':
             elif usercom.lower() == 'add':
                 
                 try:
+                    taskType = inpur('Enter D or M to create a day-based or month-based task')
                     taskDescription = input('Enter the description for the task: ')
                     dateDetails = input('Enter the date the task will begin: ')
 

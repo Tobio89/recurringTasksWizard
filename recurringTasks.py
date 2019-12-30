@@ -48,11 +48,30 @@ def listDueTomorrow(listOfTasks):
 
     return tasksDueTomorrow
     
+def findSoonestTask(listOfTasks):
+    for task in listOfTasks:
+        task.renewDueDates()
 
+    soonestTaskIndex = 0
+    soonestDate = listOfTasks[0].dueDates[0]
+
+    for index, task in enumerate(listOfTasks):
+        task.renewDueDates
+        if task.dueDates[0] <= soonestDate:
+            soonestTaskIndex = index
+            soonestDate = task.dueDates[0]
+    return soonestTaskIndex
+
+def sortTasksByDueDate(listOfTasks):
+    sortedList = []
+    for item in range(len(listOfTasks)):
+        soonest = findSoonestTask(listOfTasks)
+        sortedList.append(listOfTasks.pop(soonest))
+    
+    return sortedList
 
 print('RECURRING TASK WIZARD')
-tasksLoadedFromShelf = openShelf()
-
+tasksLoadedFromShelf = sortTasksByDueDate(openShelf()) #Selection sort tasks by due date
 
 
 displayTasks = True
@@ -140,9 +159,6 @@ if changeToSave:
     print('Saving changes...')
     saveToShelf(tasksLoadedFromShelf)
     print('Saving done. Bye!')
-
-
-
 
 
 
