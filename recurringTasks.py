@@ -1,4 +1,4 @@
-import datetime, os, pprint, shelve
+import datetime, os, pprint, shelve, time
 
 import recurringTasksDataInterface as tasksData
 from recurringTasksList import getTimelessDate, basicTask, monthTask
@@ -73,10 +73,11 @@ def sortTasksByDueDate(listOfTasks):
 print('RECURRING TASK WIZARD')
 tasksLoadedFromShelf = sortTasksByDueDate(openShelf()) #Selection sort tasks by due date
 
-
+    
 displayTasks = True
 RUNNING = True
 changeToSave = False
+
 
 while RUNNING:
     if displayTasks:
@@ -87,8 +88,13 @@ while RUNNING:
                 print(f'     - {task.description}')
             print('\n')
         else:
-            print('None')
+            print('No tasks scheduled for today')
+            print('Exiting...')
+            RUNNING = False
+            time.sleep(3)
+            break
         displayTasks = False
+
     print('Commands include add, remove, delay, tomorrow, and list')
     userCom = input('Enter a command, or enter nothing to exit: ').lower()
 
@@ -161,5 +167,5 @@ if changeToSave:
     print('Saving done. Bye!')
 
 
-
-
+# tasksDueToday = [task for task in tasksLoadedFromShelf if task.isDueToday()]
+# print(tasksDueToday[1].dueDates)
