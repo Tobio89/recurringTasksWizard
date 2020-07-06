@@ -87,12 +87,12 @@ while RUNNING:
             for task in tasksDueToday:
                 print(f'     - {task.description}')
             print('\n')
-        # else:
-        #     print('No tasks scheduled for today')
-        #     print('Exiting...')
-        #     RUNNING = False
-        #     time.sleep(3)
-        #     break
+        else:
+            print('No tasks scheduled for today')
+            print('Exiting...')
+            RUNNING = False
+            time.sleep(3)
+            break
         displayTasks = False
 
     print('Commands include add, remove, delay, tomorrow, and list')
